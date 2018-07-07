@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -120,9 +121,9 @@ public class ReviewController {
 	        System.out.println("-------------- file end --------------");
 	        
 	        /*resources루트를 가져오기 */
-	        String filePath = "C:\\java\\70_Spring\\ticketproject(realfinal)\\src\\main\\webapp\\resources\\review\\";
-	//        String htmlFolder ="\\resources\\review\\"; //저장할 경로
-	//        String filePath =request.getSession().getServletContext().getRealPath(htmlFolder)+"\\"; //web-inf바로전 까지 경로 가져오기저장할 경로
+//	        String filePath = "C:\\java\\70_Spring\\ticketproject(realfinal)\\src\\main\\webapp\\resources\\review\\";
+//	        String filePath = "classpath:/resources\\review\\";
+	        Set filePath =request.getSession().getServletContext().getResourcePaths("/"); //web-inf바로전 까지 경로 가져오기저장할 경로
 	        System.out.println("파일 저장 경로:" + filePath);
 	        
 	        //파일 이동(파일 카피가 아님)            
