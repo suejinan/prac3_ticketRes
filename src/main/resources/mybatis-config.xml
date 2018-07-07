@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+        <setting name="cacheEnabled" value="false" />
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+	<typeAliases>
+		<typeAlias alias="QnAboard" type="com.spring.tic.qna_board.QnABoardVO"/>
+		<typeAlias alias="QnAcomm" type="com.spring.tic.qna_board.QnAComVO"/>
+		<typeAlias alias="MemberVO" type="com.spring.tic.manager.MemberVO"/>
+		<typeAlias alias="PartnerVO" type="com.spring.tic.manager.PartnerVO"/>
+		
+		<!-- 수진 -->
+		<typeAlias alias="user" type="com.spring.tic.user.UserVO"/>
+		<typeAlias alias="wish" type="com.spring.tic.user.WishVO"/>
+		<typeAlias alias="review" type="com.spring.tic.review_board.ReviewVO"/>
+		
+		<!-- 재원 -->
+		<typeAlias alias="product" type="com.spring.tic.product_board.ProductVO"/>
+		
+		<!-- 효정 -->
+		<typeAlias alias="notice" type="com.spring.tic.noticeboard.NBoardVO"/>
+	</typeAliases>
+
+	<mappers> 
+		<mapper resource="mappings/QnAboard-mapping.xml" />
+		<mapper resource="mappings/QnAboard-mapping.xml" />
+		<mapper resource="mappings/Manager-mapping.xml" />
+		<mapper resource="mappings/Manager-mapping.xml" />
+		
+		<!-- 수진 -->
+		<mapper resource="mappings/user-mapping.xml" />
+		<mapper resource="mappings/review-mapping.xml"/>
+		
+		<!-- 재원 -->
+		<mapper resource="mappings/product-mapping.xml"/>
+		
+		<!-- 효정 -->
+		<mapper resource="mappings/notice_mapping.xml"/>
+	</mappers>
+</configuration>

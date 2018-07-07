@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="productDAO">
+
+   <!-- 상품 관리자 -->
+   <!-- 00. 목록 전체불러오기 -->
+   <select id="product_index" resultType="com.spring.tic.product_board.ProductVO">
+      SELECT *
+        FROM PLAY_LIST
+       WHERE 1=1
+       <if test="searchCondition == 'TITLE'">
+         AND TITLE LIKE '%'|| #{searchKeyword} ||'%'
+       </if>
+       <if test="searchCondition == 'CONTENT'">
+           AND CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+       </if>
+       ORDER BY PLAY_ID DESC
+   </select>
+   
+    <!-- 01. 카테고리 선택 목록 -->
+    <select id="product_list" resultType="com.spring.tic.product_board.ProductVO">
+        SELECT *
+          FROM PLAY_LIST
+         WHERE CATEGORY = #{category}
+         ORDER BY PLAY_ID DESC
+    </select>
+    
+    <!-- 02. 상품 상세보기 -->
+      <select id="product_view" resultType="com.spring.tic.product_board.ProductVO">
+      SELECT *
+        FROM PLAY_LIST, PARTNER
+         WHERE PLAY_LIST.P_ID = PARTNER.P_ID
+         AND PLAY_ID = #{play_id}
+   </select>
+   
+   <!-- 03. 상품 등록 --> 
+    <insert id="product_insert" parameterType="product">
+       INSERT INTO PLAY_LIST
+      VALUES(PLAY_LIST_SEQ.nextval, #{p_id}, #{title}, #{play_date}, 
+            #{time}, #{price}, #{seat_max}, #{seat_rest}, #{category}, 
+            #{content}, #{file_name})
+    </insert> 
+
+   <!-- 04. 상품 수정 -->
+   <update id="product_update" parameterType="product">
+      UPDATE PLAY_LIST
+         SET TITLE = #{title},
+               P_ID = #{p_id},
+               PLAY_DATE = #{play_date},
+               TIME = #{time},
+               PRICE = #{price},
+               SEAT_MAX = #{seat_max},
+               SEAT_REST = #{seat_rest}, 
+               CATEGORY = #{category}, 
+               CONTENT = #{content}
+       WHERE PLAY_ID = #{play_id}
+   </update>
+   <update id="product_updatewithFile_name" parameterType="product">
+      UPDATE PLAY_LIST
+         SET TITLE = #{title},
+               P_ID = #{p_id},
+               PLAY_DATE = #{play_date},
+               TIME = #{time},
+               PRICE = #{price},
+               SEAT_MAX = #{seat_max},
+               SEAT_REST = #{seat_rest}, 
+               CATEGORY = #{category}, 
+               CONTENT = #{content},
+               FILE_NAME = #{file_name}
+       WHERE PLAY_ID = #{play_id}
+   </update>
+   
+   <!-- 05. 상품 삭제 -->
+   <delete id="product_delete">
+      DELETE FROM PLAY_LIST
+       WHERE PLAY_ID = #{play_id}
+   </delete>
+   
+</mapper>

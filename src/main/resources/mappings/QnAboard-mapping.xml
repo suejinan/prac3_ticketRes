@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+					<!-- DAOmybatis에서 사용하는 네임스페이스 -->
+<mapper namespace="QnABoardDAO">
+
+	<resultMap id="QnAboardResult" type="QnAboard">
+		<result property="q_idx" column="Q_IDX"/>
+		<result property="id" column="ID"/>
+		<result property="q_title" column="Q_TITLE"/>
+		<result property="q_content" column="Q_CONTENT"/>
+		<result property="regdate" column="REGDATE"/>
+		<result property="hit" column="HIT"/>
+	</resultMap>
+	
+	<resultMap id="QnACommResult" type="QnAcomm">
+		<result property="c_idx" column="C_IDX"/>
+		<result property="q_idx" column="Q_IDX"/>
+		<result property="id" column="ID"/>
+		<result property="c_content" column="C_CONTENT"/>
+		<result property="regdate" column="REGDATE"/>
+	</resultMap>
+	
+	<!-- 게시글 상세 조회 -->
+	<select id="getBoard" parameterType="QnAboard" resultType="QnAboard">
+		SELECT *
+		  FROM QNA_BOARD
+		 WHERE Q_IDX = #{q_idx}
+	</select>
+	
+	<!-- 전체 게시글 조회(ResultMap 사용) -->
+	<select id="getBoardList" resultMap="QnAboardResult">
+		SELECT *
+		  FROM QNA_BOARD
+		 WHERE 1=1
+		<if test="searchCondition == 'TITLE'">
+		   AND Q_TITLE LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		<if test="searchCondition == 'CONTENT'">
+		   AND Q_CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		 ORDER BY Q_IDX DESC
+	</select>
+	
+	<select id="getBoardList_T" resultMap="QnAboardResult">
+		SELECT *
+		  FROM QNA_BOARD
+		  WHERE Q_TITLE LIKE '%'|| #{searchKeyword} ||'%' 
+		 ORDER BY Q_IDX DESC
+	</select>
+	<select id="getBoardList_C" resultMap="QnAboardResult">
+		SELECT *
+		  FROM QNA_BOARD
+		 WHERE Q_CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+		 ORDER BY Q_IDX DESC
+	</select>
+
+	<insert id="insertBoard" parameterType="QnAboard">
+		INSERT INTO QNA_BOARD (Q_IDX, Q_TITLE, ID, Q_CONTENT, REGDATE, HIT)
+		VALUES ((SELECT NVL(MAX(Q_IDX),0)+1 FROM QNA_BOARD),
+		       #{q_title}, #{id}, #{q_content, jdbcType=VARCHAR}, SYSDATE, #{hit})
+	</insert>
+	
+	<update id="updateBoard" parameterType="QnAboard">
+	<![CDATA[
+		UPDATE QNA_BOARD 
+		   SET Q_TITLE = #{q_title}, 
+		       Q_CONTENT = #{q_content, jdbcType=VARCHAR} 
+		 WHERE Q_IDX = #{q_idx}
+	]]>
+	</update>
+	
+	<delete id="deleteBoard" parameterType="QnAboard">
+		DELETE FROM QNA_BOARD WHERE Q_IDX = #{q_idx}
+	</delete>
+	
+	<!-- 조회수 증가 처리 -->
+	<update id="updateBoardHit" parameterType="QnAboard">
+		UPDATE QNA_BOARD 
+		   SET HIT = HIT + 1 
+		 WHERE Q_IDX = #{q_idx}
+	</update>
+	
+	<!-- 댓글 목록 조회 -->
+	<select id="getComm" resultMap="QnACommResult">
+		SELECT *
+		  FROM QNA_COMMENT
+		 WHERE Q_IDX = #{q_idx}
+		 ORDER BY SYSDATE DESC
+	</select>
+
+	<!-- 댓글 등록 -->
+	<insert id="insertComm" parameterType="com.spring.tic.qna_board.QnAComVO">
+		INSERT INTO QNA_COMMENT (C_IDX, Q_IDX, ID, C_CONTENT, REGDATE)
+		VALUES ((SELECT NVL(MAX(C_IDX),0)+1 FROM QNA_COMMENT),
+		       #{q_idx}, #{id}, #{c_content, jdbcType=VARCHAR}, SYSDATE)    
+	</insert>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="deleteComm" parameterType="com.spring.tic.qna_board.QnAComVO">
+		DELETE FROM QNA_COMMENT WHERE C_IDX = #{c_idx}
+	</delete>
+</mapper>

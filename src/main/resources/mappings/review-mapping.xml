@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReviewDAO">
+	<resultMap id="reviewResult" type="review">
+		<result property="id" column="ID"/>
+		<result property="r_title" column="R_TITLE"/>
+		<result property="r_content" column="R_CONTENT"/>
+		<result property="regdate" column="REGDATE"/>
+		<result property="play_id" column="PLAY_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="r_idx" column="R_IDX"/>
+		<result property="hit" column="HIT"/>
+		<result property="original_file_name" column="ORIGINAL_FILE_NAME"/>
+		<result property="saved_file_name" column="SAVED_FILE_NAME"/>
+		<result property="file_size" column="FILE_SIZE"/>
+		<result property="file_idx" column="FILE_IDX"/>
+	</resultMap>
+	
+	<!-- 전체 게시글 조회(ResultMap 사용) -->
+	<select id="getReviewList" resultMap="reviewResult">
+		SELECT *
+		  FROM REVIEW_BOARD R, PLAY_LIST P
+		 WHERE R.PLAY_ID = P.PLAY_ID
+		<if test="searchCondition == 'TITLE'">
+		   AND R.R_TITLE LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		<if test="searchCondition == 'CONTENT'">
+		   AND R.R_CONTENT LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		<if test="searchCondition == 'PLAY'">
+		   AND P.TITLE LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		<if test="searchCondition == 'ID'">
+		   AND R.ID LIKE '%'|| #{searchKeyword} ||'%'
+		</if>
+		 ORDER BY R.R_IDX DESC
+	</select>
+
+	<!-- 게시글 상세 조회 -->
+	<select id="getReview" parameterType="review" resultType="review">
+		SELECT *
+		  FROM REVIEW_BOARD R, REVIEW_BOARD_FILE F, PLAY_LIST P
+		 WHERE R.PLAY_ID = P.PLAY_ID
+		   AND F.R_IDX(+) = R.R_IDX
+		   AND R.R_IDX = #{r_idx}
+	</select>
+
+	<insert id="insertReview" parameterType="review">
+		INSERT INTO REVIEW_BOARD (R_IDX, R_TITLE, ID, R_CONTENT, REGDATE, PLAY_ID, HIT)
+		VALUES (SEQ_REVIEW_IDX.NEXTVAL, #{r_title}, #{id}, #{r_content}, SYSDATE, #{play_id}, 0)
+	</insert>
+	<insert id="insertFile" parameterType="hashmap">
+		INSERT INTO REVIEW_BOARD_FILE (FILE_IDX, R_IDX, ORIGINAL_FILE_NAME, SAVED_FILE_NAME, FILE_SIZE)
+        VALUES (SEQ_REVIEW_FILE_IDX.NEXTVAL, SEQ_REVIEW_IDX.CURRVAL,
+            #{original_file_name}, #{saved_file_name}, #{file_size} )
+	</insert>
+	
+	<update id="updateReview" parameterType="review">
+		UPDATE REVIEW_BOARD 
+		   SET R_TITLE = #{r_title}, 
+		       R_CONTENT = #{r_content}
+		 WHERE R_IDX = #{r_idx}
+	</update>
+	<!-- 기존첨부파일 존재할 때 새로 첨부파일 수정시 -->
+	<update id="updateFile" parameterType="review">
+		UPDATE REVIEW_BOARD_FILE
+		   SET ORIGINAL_FILE_NAME = #{original_file_name}, 
+		   	   SAVED_FILE_NAME = #{saved_file_name},
+		       FILE_SIZE = #{file_size}
+		 WHERE FILE_IDX = #{file_idx}
+	</update>
+	<!-- 기존첨부파일 존재하지 않을 때 새로 첨부파일 삽입시 -->
+	<insert id="insertUploadFile" parameterType="review">
+	INSERT INTO REVIEW_BOARD_FILE (FILE_IDX, R_IDX, ORIGINAL_FILE_NAME, SAVED_FILE_NAME, FILE_SIZE)
+        VALUES (SEQ_REVIEW_FILE_IDX.NEXTVAL,#{r_idx}, #{original_file_name}, #{saved_file_name}, #{file_size} )
+	</insert>
+
+	
+	<delete id="deleteReview" parameterType="review">
+		DELETE FROM REVIEW_BOARD WHERE R_IDX = #{r_idx}
+	</delete>
+	<delete id="deleteFile" parameterType="review">
+		DELETE FROM REVIEW_BOARD_FILE WHERE R_IDX = #{r_idx}
+	</delete>
+	
+	<!-- 조회수 증가 처리 -->
+	<update id="updateReviewHit" parameterType="review">
+		UPDATE REVIEW_BOARD 
+		   SET HIT = HIT + 1 
+		 WHERE R_IDX = #{r_idx}
+	</update>
+	
+	
+</mapper>

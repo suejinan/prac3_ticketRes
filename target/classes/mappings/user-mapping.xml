@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserDAO">
+	<select id="getUserOne" parameterType="user" resultType="user">
+		SELECT *
+		  FROM MEMBER
+		 WHERE ID = #{id}
+	</select>
+	
+	<!--========================================= 회원가입 ======================================= -->
+	<insert id="insertUser" parameterType="user">
+		INSERT INTO MEMBER (ID, PASSWORD, NAME, ADDRESS, POINT, PHONE1, PHONE2, PHONE3, EMAILID, EMAILADDR)
+		VALUES (#{id}, #{password}, #{name},#{address}, 0
+				, #{phone1}, #{phone2}, #{phone3}, #{emailid}, #{email_dns}||#{emailaddr})
+	</insert>
+	
+	<!--========================================= MYPAGE ( MYINFO )======================================= -->
+	<update id="updateUser" parameterType="user">
+		UPDATE MEMBER
+		   SET PASSWORD = #{password},
+		   	   NAME = #{name}, 
+		   	   ADDRESS = #{address}, 
+		   	   POINT = 0,
+		   	   PHONE1 = #{phone1},
+		   	   PHONE2 = #{phone2}, 
+		   	   PHONE3 = #{phone3}, 
+		   	   EMAILID = #{emailid}, 
+		   	   EMAILADDR = #{email_dns}||#{emailaddr}
+		 WHERE ID = #{id}
+	</update>
+	
+	<delete id="deleteUser" parameterType="user">
+		DELETE FROM MEMBER WHERE ID = #{id}
+	</delete>
+
+	<!--========================================= MYPAGE ( MYWISH )======================================= -->
+	<resultMap id="wishResult" type="wish">
+		<result property="w_idx" column="W_IDX"/>
+		<result property="id" column="ID"/>
+		<result property="play_id" column="PLAY_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="category" column="CATEGORY"/>
+		<result property="file_ori" column="FILE_ORI"/>
+		<result property="file_name" column="FILE_NAME"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+
+	<!-- 회원 위시리스트 조회(ResultMap 사용) -->
+   <select id="getWishList" resultMap="wishResult">
+      SELECT MYWISH.W_IDX, MYWISH.ID, MYWISH.PLAY_ID, PLAY_LIST.TITLE, PLAY_LIST.CATEGORY
+         , PLAY_LIST.FILE_NAME, PLAY_LIST.CONTENT
+        FROM MYWISH, PLAY_LIST
+       WHERE MYWISH.PLAY_ID = PLAY_LIST.PLAY_ID
+         AND MYWISH.ID = #{id}
+       ORDER BY MYWISH.PLAY_ID DESC
+      </select>
+   	
+   <delete id="deleteWish" parameterType="wish">
+		DELETE FROM MYWISH WHERE W_IDX = #{w_idx}
+	</delete>	
+   
+	<!--========================================= MYPAGE ( BUY_LIST )======================================= -->
+   <!-- 회원 위시리스트 조회(ResultMap 사용) -->
+    <!--========================================= MYPAGE ( BUY_LIST )======================================= -->
+   <!-- 회원 예매리스트 조회 -->
+   <select id="getBuyList" resultType="com.spring.tic.user.BuyVO">
+      SELECT B.B_IDX, B.ID, B.PLAY_ID, B.BUY_QUANTITY, P.TITLE, P.PLAY_DATE
+         , P.TIME, P.CATEGORY, P.FILE_NAME
+        FROM BUY_LIST B, PLAY_LIST P
+       WHERE B.PLAY_ID = P.PLAY_ID
+         AND B.ID = #{id}
+      ORDER BY P.PLAY_DATE DESC
+      </select>
+   	
+   	<delete id="deleteBuy" parameterType="com.spring.tic.user.BuyVO">
+		DELETE FROM BUY_LIST WHERE B_IDX = #{b_idx}
+	</delete>
+
+   	
+</mapper>

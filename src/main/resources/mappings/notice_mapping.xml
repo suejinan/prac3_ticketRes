@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NBoardDAO">
+
+	<resultMap type="notice" id="noticeResult">
+		<result property="id" column="ID"/> 
+		<result property="n_title" column="N_TITLE"/> 
+		<result property="n_content" column="N_CONTENT"/> 
+		<result property="regdate" column="REGDATE"/> 
+		<result property="n_idx" column="N_IDX"/> 
+		<result property="hit" column="HIT"/> 
+	</resultMap>
+
+
+	<!-- 전체 게시글 조회(resultMap사용) -->
+	<select id="getNBoardList" resultMap="noticeResult">
+		SELECT * FROM NOTICE_BOARD WHERE 1=1
+			<if test="searchCondition == 'TITLE'">
+				AND N_TITLE LIKE '%'||#{searchKeyword}||'%'
+			</if>
+			<if test="searchCondition == 'CONTENT'">
+				AND N_CONTENT LIKE '%'||#{searchKeyword}||'%'
+			</if>
+		ORDER BY N_IDX DESC
+	</select>
+
+	
+	<!-- 게시글 하나 조회 -->
+	<select id="getNBoard" parameterType="notice" resultType="notice">
+		SELECT * FROM NOTICE_BOARD
+		WHERE N_IDX = #{n_idx} 
+	</select>
+	
+
+	<!-- 글 작성 -->
+	<insert id="insertNBoard" parameterType="notice">
+		INSERT INTO NOTICE_BOARD (N_IDX, N_TITLE, ID, N_CONTENT, REGDATE)
+		VALUES ((SELECT NVL(MAX(N_IDX),0)+1 FROM NOTICE_BOARD), #{n_title}, #{id}, #{n_content}, SYSDATE)
+	</insert>
+
+	<!-- 조회수 증가 -->
+	<update id="updateNBoardHit" parameterType="notice">
+	  	UPDATE NOTICE_BOARD
+	  		SET HIT = HIT + 1
+	  		WHERE N_IDX = #{n_idx} 
+	</update>
+	
+	
+	
+	<!-- 글 수정 -->
+	<update id="updateNBoard" parameterType="notice" >
+		UPDATE NOTICE_BOARD
+			SET N_TITLE = #{n_title},
+					N_CONTENT = #{n_content}
+			WHERE N_IDX = #{n_idx}		
+	</update>
+	
+	
+	<!-- 글 삭제 -->
+	<delete id="deleteNBoard"  parameterType="notice">
+		DELETE FROM NOTICE_BOARD WHERE N_IDX=#{n_idx}
+	</delete>
+
+
+</mapper>
