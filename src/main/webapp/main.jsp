@@ -31,7 +31,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 col-lg-4">
-                <h1>Bit ticket<small>bit ticket Homepage</small></h1>
+                <h1>Bit ticket<small>bit ticket Homepage!</small></h1>
 			</div>
 			<div class="col-md-6 col-lg-3 ml-auto admin-bar hidden-sm-down">
 				<nav class="nav nav-inline"> 
